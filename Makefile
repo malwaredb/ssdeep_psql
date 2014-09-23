@@ -1,22 +1,18 @@
+INCLUDE=$(shell pg_config --includedir-server)
+INSTALLDIR=$(shell pg_config --pkglibdir)
+LIBRARY=-lfuzzy
 
-PG_CPPFLAGS = -I.
+all: ssdeep_psql.so
 
-MODULE_big = ssdeep_psql
-OBJS = ssdeep_psql.o
-SHLIB_LINK = -lfuzzy
+ssdeep_psql.o: ssdeep_psql.c
+	g++ -fPIC -c ssdeep_psql.c -I$(INCLUDE)
 
-# DATA_built = pg_trgm.sql
-# DATA = uninstall_pg_trgm.sql
-# DOCS = README.pg_trgm
-# REGRESS = pg_trgm
+ssdeep_psql.so: ssdeep_psql.o
+	gcc -shared -Wl,--no-as-needed -lfuzzy -o ssdeep_psql.so ssdeep_psql.o
 
+install: ssdeep_psql.so
+	install -g root -o root ssdeep_psql.so $(INSTALLDIR)/ssdeep_psql.so
 
-ifdef USE_PGXS
-PGXS := $(shell pg_config --pgxs)
-include $(PGXS)
-else
-subdir = contrib/ssdeep_psql
-top_builddir = ../..
-include $(top_builddir)/src/Makefile.global
-include $(top_srcdir)/contrib/contrib-global.mk
-endif
+.phony: clean
+clean:
+	rm -f ssdeep_psql.so ssdeep_psql.o
