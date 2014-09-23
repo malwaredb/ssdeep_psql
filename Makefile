@@ -1,11 +1,11 @@
-INCLUDE=$(shell pg_config --includedir-server)
+INCLUDESRV=$(shell pg_config --includedir-server)
+INCLUDEDIR=$(shell pg_config --includedir)
 INSTALLDIR=$(shell pg_config --pkglibdir)
-LIBRARY=-lfuzzy
 
 all: ssdeep_psql.so
 
 ssdeep_psql.o: ssdeep_psql.c
-	g++ -fPIC -c ssdeep_psql.c -I$(INCLUDE)
+	gcc -I$(INCLUDESRV) -I$(INCLUDEDIR) -fPIC -c ssdeep_psql.c 
 
 ssdeep_psql.so: ssdeep_psql.o
 	gcc -shared -Wl,--no-as-needed -lfuzzy -o ssdeep_psql.so ssdeep_psql.o
